@@ -13,8 +13,8 @@ export const useCartStore = defineStore('cart', {
       const res = await axios.get('/cart/')
       this.cart = res.data
     },
-    async addItem(product_id, quantity = 1) {
-      await axios.post('/cart/', { product_id, quantity })
+    async addItem(product_id, quantity = 1, size = '', color = '') {
+      await axios.post('/cart/', { product_id, quantity, size, color })
       await this.fetchCart()
     },
     async removeItem(id) {

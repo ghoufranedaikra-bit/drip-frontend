@@ -1,35 +1,74 @@
 <template>
   <div class="confirm-page">
-    <div class="confirm-card">
-      <div class="check-circle">
-        <i class="ti ti-circle-check"></i>
+    <div class="confirm-hero">
+      <div class="confirm-hero-inner">
+        <div class="check-anim">
+          <i class="ti ti-circle-check"></i>
+        </div>
+        <h1>ORDER CONFIRMED!</h1>
+        <p>Thank you for shopping with DRIP 🔥</p>
       </div>
-      <h1>ORDER PLACED!</h1>
-      <p class="sub">Thank you for shopping with DRIP 🔥</p>
-      <p class="email-note">Order details have been sent to <strong>{{ userEmail }}</strong></p>
+    </div>
 
-      <div class="order-summary" v-if="order">
-        <h2>ORDER #{{ order.id }}</h2>
-        <div class="order-items">
-          <div v-for="item in order.items" :key="item.id" class="confirm-item">
-            <span>{{ item.product.name }}</span>
-            <span>x{{ item.quantity }}</span>
-            <span>{{ item.price }} DA</span>
+    <div class="page">
+      <div class="confirm-layout" v-if="order">
+        <div class="order-details">
+          <div class="detail-header">
+            <div>
+              <p class="detail-label">ORDER NUMBER</p>
+              <h2>#{{ String(order.id).padStart(5, '0') }}</h2>
+            </div>
+            <span class="status-pill">{{ order.status }}</span>
+          </div>
+
+          <div class="order-items">
+            <div v-for="item in order.items" :key="item.id" class="confirm-item">
+              <div class="ci-info">
+                <p class="ci-name">{{ item.product.name }}</p>
+                <p class="ci-qty">Qty: {{ item.quantity }}</p>
+              </div>
+              <p class="ci-price">{{ item.price }} DA</p>
+            </div>
+          </div>
+
+          <div class="order-totals">
+            <div class="total-row">
+              <span>Subtotal</span>
+              <span>{{ orderTotal }} DA</span>
+            </div>
+            <div class="total-row">
+              <span>Delivery</span>
+              <span class="free">FREE</span>
+            </div>
+            <div class="total-row grand">
+              <span>Total</span>
+              <span>{{ orderTotal }} DA</span>
+            </div>
           </div>
         </div>
-        <div class="confirm-total">
-          <span>Total</span>
-          <span>{{ orderTotal }} DA</span>
-        </div>
-        <div class="delivery-note">
-          <i class="ti ti-truck-delivery"></i>
-          <span>Cash on Delivery — Pay when your order arrives</span>
-        </div>
-      </div>
 
-      <div class="confirm-actions">
-        <router-link to="/orders" class="btn" style="text-decoration:none;">View My Orders</router-link>
-        <router-link to="/" class="btn-outline" style="text-decoration:none;">Continue Shopping</router-link>
+        <div class="confirm-sidebar">
+          <div class="info-card">
+            <i class="ti ti-mail" style="font-size:2rem; color:var(--blue);"></i>
+            <h3>CHECK YOUR EMAIL</h3>
+            <p>Order details sent to <strong>{{ userEmail }}</strong></p>
+          </div>
+
+          <div class="info-card delivery">
+            <i class="ti ti-truck-delivery" style="font-size:2rem; color:white;"></i>
+            <h3>CASH ON DELIVERY</h3>
+            <p>Pay when your order arrives at your door 🇩🇿</p>
+          </div>
+
+          <div class="confirm-actions">
+            <router-link to="/orders" class="btn" style="text-decoration:none; display:block; text-align:center;">
+              Track My Order
+            </router-link>
+            <router-link to="/" class="btn-outline" style="text-decoration:none; display:block; text-align:center;">
+              Continue Shopping
+            </router-link>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -44,14 +83,15 @@ const userEmail = ref('')
 
 const orderTotal = computed(() => {
   if (!order.value) return 0
-  return order.value.items.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0).toFixed(2)
+  return order.value.items.reduce((sum, item) =>
+    sum + parseFloat(item.price) * item.quantity, 0
+  ).toFixed(2)
 })
 
 onMounted(async () => {
   const orders = await axios.get('/orders/')
   const list = orders.data
   order.value = list[list.length - 1]
-
   try {
     const user = await axios.get('/users/me/')
     userEmail.value = user.data.email
@@ -62,113 +102,162 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.confirm-page {
-  min-height: calc(100vh - 64px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--off-white);
-  padding: 2rem;
-}
-
-.confirm-card {
-  background: white;
-  border: 1px solid #eee;
-  border-radius: 16px;
-  padding: 3rem;
-  width: 100%;
-  max-width: 560px;
+.confirm-hero {
+  background: linear-gradient(135deg, #060e1a 0%, #0D47A1 100%);
+  padding: 5rem 2rem;
   text-align: center;
 }
 
-.check-circle {
-  width: 80px;
-  height: 80px;
-  background: #E8F5E9;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.5rem;
-  font-size: 2.5rem;
-  color: #2e7d32;
+.confirm-hero-inner {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-h1 {
+.check-anim {
+  font-size: 5rem;
+  color: #4caf50;
+  margin-bottom: 1.5rem;
+  animation: pop 0.5s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.confirm-hero h1 {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 3rem;
+  font-size: 4rem;
   letter-spacing: 4px;
-  color: var(--blue-dark);
+  color: white;
   margin-bottom: 0.5rem;
 }
 
-.sub {
-  color: var(--text-muted);
-  font-size: 1rem;
-  margin-bottom: 0.75rem;
+.confirm-hero p { color: rgba(255,255,255,0.7); font-size: 1rem; }
+
+.confirm-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 3rem;
+  align-items: start;
 }
 
-.email-note {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  background: var(--blue-light);
-  padding: 10px 16px;
-  border-radius: 8px;
-  margin-bottom: 2rem;
+.order-details {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
-.order-summary {
-  background: var(--off-white);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  text-align: left;
+.detail-header {
+  background: #060e1a;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.order-summary h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.3rem;
+.detail-label {
+  font-size: 0.7rem;
   letter-spacing: 3px;
-  margin-bottom: 1rem;
-  color: var(--blue-dark);
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 4px;
 }
+
+.detail-header h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 3px;
+  color: white;
+}
+
+.status-pill {
+  background: rgba(76,175,80,0.2);
+  color: #4caf50;
+  border: 1px solid rgba(76,175,80,0.4);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.order-items { padding: 1.5rem 2rem; }
 
 .confirm-item {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f5f5f5;
 }
 
-.confirm-total {
+.ci-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+.ci-qty { font-size: 0.8rem; color: var(--text-muted); }
+.ci-price { font-weight: 700; color: var(--blue-dark); }
+
+.order-totals {
+  background: var(--off-white);
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #eee;
+}
+
+.total-row {
   display: flex;
   justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.free { color: #4caf50; font-weight: 700; }
+
+.total-row.grand {
+  font-size: 1.1rem;
   font-weight: 700;
-  font-size: 1rem;
+  color: var(--text);
+  border-top: 1px solid #eee;
   padding-top: 1rem;
   margin-top: 0.5rem;
 }
 
-.delivery-note {
+.confirm-sidebar { display: flex; flex-direction: column; gap: 1rem; }
+
+.info-card {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-top: 1rem;
-  font-size: 0.82rem;
-  color: var(--blue);
-  font-weight: 600;
 }
 
-.confirm-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
+.info-card h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
 }
 
-@media (max-width: 480px) {
-  .confirm-card { padding: 2rem 1.25rem; }
-  h1 { font-size: 2.2rem; }
+.info-card p { font-size: 0.85rem; color: var(--text-muted); }
+
+.info-card.delivery {
+  background: var(--blue-dark);
+  border-color: var(--blue-dark);
+  color: white;
+}
+
+.info-card.delivery h3 { color: white; }
+.info-card.delivery p { color: rgba(255,255,255,0.7); }
+
+.confirm-actions { display: flex; flex-direction: column; gap: 10px; }
+
+@media (max-width: 768px) {
+  .confirm-layout { grid-template-columns: 1fr; }
+  .confirm-hero h1 { font-size: 2.5rem; }
 }
 </style>
