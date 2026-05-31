@@ -11,11 +11,11 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async login(username, password) {
-      const res = await axios.post('/users/login/', { username, password })
-      this.token = res.data.access
-      localStorage.setItem('token', this.token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
-    },
+  const res = await axios.post('/users/login/', { username, password })
+  this.token = res.data.access
+  localStorage.setItem('token', this.token)
+  axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+},
     async login(username, password) {
   const res = await axios.post('/users/login/', { username, password })
   this.token = res.data.access
